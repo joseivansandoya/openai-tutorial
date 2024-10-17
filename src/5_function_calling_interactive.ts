@@ -104,11 +104,13 @@ async function main() {
       model: "gpt-4o",
       messages: messages,
       tools: tools,
+      parallel_tool_calls: false, // set to true if you want to make multiple tool calls in parallel
     });
 
     if (response) {
+      console.debug('### DEBUG:', JSON.stringify(response, null, 2));
       // check if the assistant is calling a function
-      if (response.choices[0].message.tool_calls?.[0]) {
+      if (response.choices[0].message.tool_calls?.length) {
         const toolCall = response.choices[0].message.tool_calls?.[0];
         const functionName = toolCall.function.name;
         const functionArguments = JSON.parse(toolCall.function.arguments);
