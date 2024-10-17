@@ -9,7 +9,7 @@ const openai = new OpenAI({
 });
 
 async function main() {
-  const initialAssistantMessage = 'What can I help with? (type "exit" to end assistant)';
+  const initialAssistantMessage = '>>> What can I help with? (type "exit" to end assistant)';
   let prompt = await input({ message: initialAssistantMessage });
 
   const messages: OpenAI.ChatCompletionMessageParam[] = [
@@ -28,13 +28,13 @@ async function main() {
     if (response) {
       const content = response.choices[0].message.content;
       console.log(`>>> Assistant: ${content}`);
-      prompt = await input({ message: 'Your response: (type "exit" to end assistant)' });
+      prompt = await input({ message: '>>> You (type "exit" to end assistant): ' });
       messages.push({ role: "assistant", content });
       messages.push({ role: "user", content: prompt });
     }
   }
 
-  console.log('Goodbye!');
+  console.log('>>> Goodbye!');
 }
 
 main();
