@@ -13,6 +13,12 @@ const deliveries = [
   { deliveryId: 2, orderId: 345, name: 'B', phoneNumber: '456', date: '2021-01-02' },
   { deliveryId: 3, orderId: 465, name: 'C', phoneNumber: '789', date: '2021-01-03' },
 ];
+// mock orders
+const orders = [
+  { orderId: 123, items: ['iPhone16', 'airpods'], total: 1400, provider: 'Apple' },
+  { orderId: 345, items: ['iPhone16', 'airpods'], total: 1400, provider: 'Apple 2' },
+  { orderId: 465, items: ['iPhone16', 'airpods'], total: 1400, provider: 'Apple 3' },
+];
 
 const getDeliveryDate = (args: { orderId: string }): string => {
   const { orderId } = args;
@@ -24,8 +30,19 @@ const getDeliveryDate = (args: { orderId: string }): string => {
   return '';
 };
 
+const getOrderDetails = (args: { orderId: string }): string => {
+  const { orderId } = args;
+  for (const order of orders) {
+    if (order.orderId === Number(orderId)) {
+      return JSON.stringify(order);
+    }
+  }
+  return '';
+};
+
 const functionsMap = new Map<string, Function>();
 functionsMap.set('getDeliveryDate', getDeliveryDate);
+functionsMap.set('getOrderDetails', getOrderDetails);
 
 async function main() {
   const tools: OpenAI.ChatCompletionTool[] = [
@@ -47,6 +64,24 @@ async function main() {
         },
       },
     },
+    {
+      type: "function",
+      function: {
+        name: "getOrderDetails",
+        description: "Get the details of a customer's order. Call this whenever you need to know the details of an order, for example when a customer asks 'What did I order?' or 'How much did I pay?' or 'Who did I order from?' or 'What are the details of my order?'",
+        parameters: {
+          type: "object",
+          properties: {
+            orderId: {
+              type: "string",
+              description: "the stringified details of the order (items, total, provider)",
+            },
+          },
+          required: ["orderId"],
+          additionalProperties: false,
+        },
+      },
+    }
   ];
 
   const initialAssistantMessage = '>>> What can I help with? (type "exit" to end assistant)';
